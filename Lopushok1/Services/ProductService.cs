@@ -77,5 +77,65 @@ namespace Lopushok1.Services
             else
                 return Products.Where(p => p.ProductType.Title == Type).ToList();
         }
+
+        public void AddProduct(Product? Item)
+        {
+            if (Item == null)
+                return;
+
+            using (var db = new LopushokDbContext())
+            {
+                db.Products.Add(Item);
+                db.SaveChanges();
+            }
+        }
+        public void SaveProduct(Product? Item)
+        {
+            if (Item == null)
+                return;
+
+            using (var db = new LopushokDbContext())
+            {
+                Product product = db.Products
+                    .Where(p => p.Id == Item.Id)
+                    .First();
+
+                product.Title = Item.Title;
+                product.ProductTypeId = Item.ProductTypeId;
+                product.ArticleNumber = Item.ArticleNumber;
+                product.MinCostForAgent = Item.MinCostForAgent;
+                product.Description = Item.Description;
+                product.ProductionPersonCount = Item.ProductionPersonCount;
+                product.ProductionWorkshopNumber = Item.ProductionWorkshopNumber;
+                product.Image = Item.Image;
+
+                db.SaveChanges();
+            }
+        }
+        public void DeleteProduct(List<Product> Products, int Index)
+        {
+            var product = Products.ElementAt(Index);
+
+            using (var db = new LopushokDbContext())
+            {
+                var productMaterials = db.ProductMaterials
+                    .Where(p => p.ProductId == product.Id)
+                    .ToList();
+
+                if (productMaterials.Count == 0)
+                    return;
+
+                foreach (var pm in productMaterials)
+                    db.ProductMaterials.Remove(pm);
+
+                db.SaveChanges();
+            }
+
+            using (var db = new LopushokDbContext())
+            {
+                db.Products.Remove(product);
+                db.SaveChanges();
+            }
+        }
     }
 }

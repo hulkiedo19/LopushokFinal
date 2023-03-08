@@ -1,6 +1,7 @@
 ﻿using Lopushok1.Commands;
 using Lopushok1.Entities;
 using Lopushok1.Services;
+using Lopushok1.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,9 +104,13 @@ namespace Lopushok1.ViewModels
             Products = _pagesService.GetPage(_dbProducts, _currentPage, _itemsOnPage);
         });
 
-        public ICommand AddProduct => new Command(ap => MessageBox.Show("Add Product"));
-        public ICommand EditProduct => new Command(ap => MessageBox.Show("Edit Product"));
-        public ICommand DeleteProduct => new Command(ap => MessageBox.Show("Delete Product"));
+        public ICommand AddProduct => new Command(ap => new EditWindow("add").ShowDialog());
+        public ICommand EditProduct => new Command(ep => new EditWindow("edit").ShowDialog());
+        public ICommand DeleteProduct => new Command(dp =>
+        {
+            _productService.DeleteProduct(_pageProducts, SelectedProduct);
+            DisplayProducts();
+        });
         #endregion
 
         #region methods
@@ -114,12 +119,7 @@ namespace Lopushok1.ViewModels
         {
             _productService = new ProductService();
             _pagesService = new PagesService();
-            _methods = new List<ICommand>()
-            {
-                LeftPage,
-                RightPage,
-                SpecifiedPage
-            };
+            _methods = new List<ICommand>() { LeftPage, RightPage, SpecifiedPage };
             FilterList.AddRange(_productService.GetTypes());
 
             DisplayProducts();
