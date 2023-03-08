@@ -4,12 +4,15 @@ using Lopushok1.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace Lopushok1.ViewModels
 {
@@ -30,7 +33,7 @@ namespace Lopushok1.ViewModels
         private int _numPages = 1;
         private int _currentPage;
         private const int _itemsOnPage = 20;
-        private List<RoutedEventHandler> _methods;
+        private List<ICommand> _methods;
 
         public List<Product> Products
         {
@@ -92,20 +95,30 @@ namespace Lopushok1.ViewModels
         #endregion
 
         #region commands
+        public ICommand LeftPage => new Command(lp => Products = (_currentPage > 0) ? _pagesService.GetPage(_dbProducts, --_currentPage, _itemsOnPage) : Products);
+        public ICommand RightPage => new Command(rp => Products = (_currentPage < _numPages - 1) ? Products = _pagesService.GetPage(_dbProducts, ++_currentPage, _itemsOnPage) : Products);
+        public ICommand SpecifiedPage => new Command((object parameter) =>
+        {
+            _currentPage = Convert.ToInt32(parameter.ToString()) - 1;
+            Products = _pagesService.GetPage(_dbProducts, _currentPage, _itemsOnPage);
+        });
+
         public ICommand AddProduct => new Command(ap => MessageBox.Show("Add Product"));
         public ICommand EditProduct => new Command(ap => MessageBox.Show("Edit Product"));
         public ICommand DeleteProduct => new Command(ap => MessageBox.Show("Delete Product"));
         #endregion
 
+        #region methods
+
         public ProductServiceViewModel()
         {
             _productService = new ProductService();
             _pagesService = new PagesService();
-            _methods = new List<RoutedEventHandler>()
+            _methods = new List<ICommand>()
             {
-                SpecifiedNumberPage_Click,
-                RightPage_Click,
-                LeftPage_Click
+                LeftPage,
+                RightPage,
+                SpecifiedPage
             };
             FilterList.AddRange(_productService.GetTypes());
 
@@ -120,24 +133,6 @@ namespace Lopushok1.ViewModels
             _numPages = _pagesService.GetNumberOfPages(_dbProducts.Count, _itemsOnPage);
             Products = _pagesService.GetPage(_dbProducts, _currentPage, _itemsOnPage);
             ButtonsList = _pagesService.GetButtons(_numPages, _methods);
-        }
-
-        #region pages
-
-        public void SpecifiedNumberPage_Click(object sender, RoutedEventArgs e)
-        {
-            _currentPage = Convert.ToInt32((sender as Button).Content) - 1;
-            Products = _pagesService.GetPage(_dbProducts, _currentPage, _itemsOnPage);
-        }
-        public void RightPage_Click(object sender, RoutedEventArgs e)
-        {
-            if (_currentPage >= _numPages - 1) return;
-            Products = _pagesService.GetPage(_dbProducts, ++_currentPage, _itemsOnPage);
-        }
-        public void LeftPage_Click(object sender, RoutedEventArgs e)
-        {
-            if (_currentPage <= 0) return;
-            Products = _pagesService.GetPage(_dbProducts, --_currentPage, _itemsOnPage);
         }
 
         #endregion

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Ribbon;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Lopushok1.Services
@@ -24,7 +25,7 @@ namespace Lopushok1.Services
                 .Take(ItemsOnPage)
                 .ToList();
         }
-        public List<Button> GetButtons(int PagesNum, List<RoutedEventHandler> Methods)
+        public List<Button> GetButtons(int PagesNum, List<ICommand> Commands)
         {
             List<Button> buttons = new List<Button>();
 
@@ -34,7 +35,7 @@ namespace Lopushok1.Services
             leftPage.BorderBrush = new SolidColorBrush(Colors.White);
             leftPage.BorderThickness = new Thickness(0);
             leftPage.Background = new SolidColorBrush(Colors.White);
-            leftPage.Click += Methods[2];
+            leftPage.Command = Commands[0];
             buttons.Add(leftPage);
 
             for (int i = 0; i < PagesNum; i++)
@@ -45,7 +46,8 @@ namespace Lopushok1.Services
                 specifiedNumberPage.BorderBrush = new SolidColorBrush(Colors.White);
                 specifiedNumberPage.BorderThickness = new Thickness(0);
                 specifiedNumberPage.Background = new SolidColorBrush(Colors.White);
-                specifiedNumberPage.Click += Methods[0];
+                specifiedNumberPage.Command = Commands[2];
+                specifiedNumberPage.CommandParameter = $"{i + 1}";
                 buttons.Add(specifiedNumberPage);
             }
 
@@ -55,7 +57,7 @@ namespace Lopushok1.Services
             rightPage.BorderBrush = new SolidColorBrush(Colors.White);
             rightPage.BorderThickness = new Thickness(0);
             rightPage.Background = new SolidColorBrush(Colors.White);
-            rightPage.Click += Methods[1];
+            rightPage.Command = Commands[1];
             buttons.Add(rightPage);
 
             return buttons;
