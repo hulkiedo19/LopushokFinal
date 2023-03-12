@@ -98,7 +98,7 @@ namespace Lopushok1.Services
             {
                 Product product = db.Products
                     .Where(p => p.Id == Item.Id)
-                    .First();
+                    .Single();
 
                 product.Title = Item.Title;
                 product.ProductTypeId = Item.ProductTypeId;
@@ -122,17 +122,14 @@ namespace Lopushok1.Services
                     .Where(p => p.ProductId == product.Id)
                     .ToList();
 
-                if (productMaterials.Count == 0)
-                    return;
+                if (productMaterials.Count > 0)
+                {
+                    foreach (var pm in productMaterials)
+                        db.ProductMaterials.Remove(pm);
 
-                foreach (var pm in productMaterials)
-                    db.ProductMaterials.Remove(pm);
+                    db.SaveChanges();
+                }
 
-                db.SaveChanges();
-            }
-
-            using (var db = new LopushokDbContext())
-            {
                 db.Products.Remove(product);
                 db.SaveChanges();
             }

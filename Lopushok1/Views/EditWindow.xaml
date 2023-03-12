@@ -7,7 +7,7 @@
         xmlns:vm="clr-namespace:Lopushok1.ViewModels"
         mc:Ignorable="d"
         Title="EditWindow" 
-        Height="400" 
+        Height="420" 
         Width="400">
     <Window.DataContext>
         <vm:EditWindowViewModel/>
@@ -60,8 +60,14 @@
 
             <Button 
                 Margin="0, 10, 0, 0"
-                Content="Add/Save"
-                Command="{Binding AddOrSaveProduct}"/>
+                Content="Add"
+                x:Name="AddButton"
+                Command="{Binding AddProduct}"/>
+            <Button 
+                Margin="0, 10, 0, 0"
+                Content="Save"
+                x:Name="SaveButton"
+                Command="{Binding SaveProduct}"/>
             <Button 
                 Margin="0, 10, 0, 0"
                 Content="Exit"

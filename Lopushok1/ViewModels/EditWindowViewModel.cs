@@ -15,6 +15,7 @@ namespace Lopushok1.ViewModels
     {
         #region locals and props
 
+        private int _productId;
         ProductService _productService;
         private string _title;
         private string _productTypeId;
@@ -24,6 +25,8 @@ namespace Lopushok1.ViewModels
         private string _personCount;
         private string _workshopNumber;
         private string _minCost;
+
+        public bool IsChanged = false;
 
         public string Title
         {
@@ -70,10 +73,20 @@ namespace Lopushok1.ViewModels
 
         #region commands
 
-        public ICommand AddProduct => new Command(p => _productService.AddProduct(GetProduct()));
-        public ICommand SaveProduct => new Command(p => _productService.SaveProduct(GetProduct()));
+        public ICommand AddProduct => new Command(p =>
+        {
+            _productService.AddProduct(GetProduct());
+            IsChanged = true;
+        });
+        public ICommand SaveProduct => new Command(p =>
+        {
+            _productService.SaveProduct(GetProduct());
+            IsChanged = true;
+        });
 
         #endregion
+
+        #region methods
 
         public EditWindowViewModel()
         {
@@ -84,6 +97,7 @@ namespace Lopushok1.ViewModels
         {
             Product product = new Product();
 
+            product.Id = _productId;
             product.Title = Title;
             product.ProductTypeId = Convert.ToInt32(ProductTypeId);
             product.ArticleNumber = ArticleNumber;
@@ -96,9 +110,10 @@ namespace Lopushok1.ViewModels
             return product;
         }
 
-        private void SetProduct(Product Item)
+        public void SetProduct(Product Item)
         {
-            Title= Item.Title;
+            _productId = Item.Id;
+            Title = Item.Title;
             ProductTypeId = Convert.ToString(Item.ProductTypeId);
             Description = Item.Description;
             ArticleNumber = Item.ArticleNumber;
@@ -107,5 +122,7 @@ namespace Lopushok1.ViewModels
             WorkshopNumber = Convert.ToString(Item.ProductionWorkshopNumber);
             MinCost = Convert.ToString(Item.MinCostForAgent);
         }
+
+        #endregion
     }
 }

@@ -96,6 +96,7 @@ namespace Lopushok1.ViewModels
         #endregion
 
         #region commands
+
         public ICommand LeftPage => new Command(lp => Products = (_currentPage > 0) ? _pagesService.GetPage(_dbProducts, --_currentPage, _itemsOnPage) : Products);
         public ICommand RightPage => new Command(rp => Products = (_currentPage < _numPages - 1) ? Products = _pagesService.GetPage(_dbProducts, ++_currentPage, _itemsOnPage) : Products);
         public ICommand SpecifiedPage => new Command((object parameter) =>
@@ -104,13 +105,22 @@ namespace Lopushok1.ViewModels
             Products = _pagesService.GetPage(_dbProducts, _currentPage, _itemsOnPage);
         });
 
-        public ICommand AddProduct => new Command(ap => new EditWindow("add").ShowDialog());
-        public ICommand EditProduct => new Command(ep => new EditWindow("edit").ShowDialog());
+        public ICommand AddProduct => new Command(ap =>
+        {
+            if(new EditWindow("add", null).ShowDialog() == true) 
+                DisplayProducts();
+        });
+        public ICommand EditProduct => new Command(ep =>
+        {
+            if(new EditWindow("edit", _pageProducts[SelectedProduct]).ShowDialog() == true) 
+                DisplayProducts();
+        });
         public ICommand DeleteProduct => new Command(dp =>
         {
             _productService.DeleteProduct(_pageProducts, SelectedProduct);
             DisplayProducts();
         });
+        
         #endregion
 
         #region methods
